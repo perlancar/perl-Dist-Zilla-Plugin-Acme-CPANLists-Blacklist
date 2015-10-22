@@ -172,21 +172,64 @@ sub setup_installer {
 
 __PACKAGE__->meta->make_immutable;
 1;
-# ABSTRACT: Ensure prereq to spec modules
+# ABSTRACT: Blacklist prereqs using a CPANList module/author list
 
 =for Pod::Coverage .+
 
 =head1 SYNOPSIS
 
-In C<dist.ini>:
+In F<dist.ini>:
 
- [PERLANCAR::EnsurePrereqToSpec]
+ [Acme::CPANLists::Blacklist]
+ module_list=PERLANCAR::Modules I'm avoiding
+
+During build, if there is a prereq to a module listed in the above list, the
+build process will be aborted.
 
 
 =head1 DESCRIPTION
 
-I like to specify prerequisite to spec modules such as L<Rinci>, L<Riap>,
-L<Sah>, L<Setup>, etc as DevelopRecommends, to express that a distribution
-conforms to such specification(s).
+C<Acme::CPANLists::*> modules contains various author lists and module lists.
+With this plugin, you can specify a blacklist to modules in those lists.
 
-Currently only L<Rinci> is checked.
+If you specify a module list, e.g.:
+
+ module_list=SomeNamespace::some name
+
+then a module called C<Acme::CPANLists::SomeNamespace> will be loaded, and
+C<some name> will be searched inside its C<@Module_Lists> variable. If a list
+with such name is found, then all modules listed in that list will be added to
+the blacklist. (Otherwise, an error will be thrown if the list is not found.)
+
+To specify more lists, add more C<module_list=> lines.
+
+Later in the build, when a prereq is specified against one of the blacklisted
+modules, an error message will be thrown and the build process aborted.
+
+To whitelist a module, list it in the Whitelist configuration in F<dist.ini>:
+
+ [Acme::CPANLists::Whitelist]
+ module=Log::Any
+
+To whitelist more modules, add more C<module=> lines.
+
+You can also specify an author list, e.g.:
+
+ author_list=SomeNamespace::some name
+
+in which C<@Author_Lists> variable will be searched instead of C<@Module_Lists>.
+And local CPAN mirror database (built using L<lcpan>) will be consulted to
+search the authors for all specified prereqs in the build. Then, if an author is
+blacklisted, an error message will be thrown and the build process aborted.
+
+As with modules, you can also whitelist some authors:
+
+ [Acme::CPANLists::Whitelist]
+ author=PERLANCAR
+
+
+=head1 SEE ALSO
+
+L<Acme::CPANLists>
+
+C<Acme::CPANLists::*> modules
