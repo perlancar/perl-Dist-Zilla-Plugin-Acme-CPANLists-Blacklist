@@ -25,6 +25,8 @@ __PACKAGE__->meta->make_immutable;
 1;
 # ABSTRACT: Specify whitelist
 
+=for Pod::Coverage .+
+
 =head1 SYNOPSIS
 
 In your F<dist.ini>:
