@@ -125,19 +125,48 @@ sub setup_installer {
             }
         }
         last unless $whitelist_plugin;
-        @whitelisted_authors = @{ $whitelist_plugin->author };
-        @whitelisted_authors = @{ $whitelist_plugin->module };
+        @whitelisted_authors = @{ $whitelist_plugin->author // []};
+        @whitelisted_modules = @{ $whitelist_plugin->module // []};
     }
 
     my $prereqs_hash = $self->zilla->prereqs->as_string_hash;
 
-    # Rinci
-    if ($self->check_dist_defines_rinci_meta) {
-        $self->log_fatal(["Dist defines Rinci metadata, but there is no DevelopRecommends prereq to Rinci"])
-            unless $self->_prereq_only_in($prereqs_hash, "Rinci", "develop", "recommends");
-    } else {
-        $self->log_fatal(["Dist does not define Rinci metadata, but there is a prereq to Rinci"])
-            unless $self->_prereq_none($prereqs_hash, "Rinci");
+    my @all_prereqs;
+    for my $phase (keys %$prereqs_hash) {
+        for my $rel (keys %{ $prereqs_hash->{$phase} }) {
+            for my $mod (keys %{ $prereqs_hash->{$phase}{$rel} }) {
+                push @all_prereqs, $mod
+                    unless $mod ~~ @all_prereqs;
+            }
+        }
+    }
+
+    if (keys %blacklisted_authors) {
+        $self->log_debug(["Checking against blacklisted authors ..."]);
+        require App::lcpan::Call;
+        my @res = App::lcpan::Call::call_lcpan_script(argv=>['mods', '--or', '--detail', @all_prereqs]);
+        for my $rec (@res) {
+            next unless $rec->{name} ~~ @all_prereqs;
+            if ($blacklisted_authors{$rec->{author}} &&
+                    !($rec->{author} ~~ @whitelisted_authors)) {
+                $self->log_fatal(["Module '%s' is released by blacklisted author '%s' (list=%s, summary=%s)",
+                                  $rec->{name}, $rec->{author},
+                                  $blacklisted_authors{$rec->{author}}{list},
+                                  $blacklisted_authors{$rec->{author}}{summary}]);
+            }
+        }
+    }
+
+    if (keys %blacklisted_modules) {
+        $self->log_debug(["Checking against blacklisted authors ..."]);
+        for my $mod (@all_prereqs) {
+            if ($blacklisted_modules{$mod} && !($mod ~~ @whitelisted_modules)) {
+                $self->log_fatal(["Module '%s' is blacklisted (list=%s, summary=%s)",
+                                  $mod,
+                                  $blacklisted_modules{$mod}{list},
+                                  $blacklisted_modules{$mod}{summary}]);
+            }
+        }
     }
 }
 
