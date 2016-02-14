@@ -144,8 +144,10 @@ sub setup_installer {
     if (keys %blacklisted_authors) {
         $self->log_debug(["Checking against blacklisted authors ..."]);
         require App::lcpan::Call;
-        my @res = App::lcpan::Call::call_lcpan_script(argv=>['mods', '--or', '--detail', @all_prereqs]);
-        for my $rec (@res) {
+        my $res = App::lcpan::Call::call_lcpan_script(argv=>['mods', '--or', '--detail', @all_prereqs]);
+        $self->log_fatal(["Can't lcpan mods: %s - %s", $res->[0], $res->[1]])
+            unless $res->[0] == 200;
+        for my $rec (@{ $res->[2] }) {
             next unless $rec->{name} ~~ @all_prereqs;
             if ($blacklisted_authors{$rec->{author}} &&
                     !($rec->{author} ~~ @whitelisted_authors)) {
