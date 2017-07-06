@@ -11,7 +11,7 @@ use Moose;
 use namespace::autoclean;
 
 with (
-    'Dist::Zilla::Role::InstallTool',
+    'Dist::Zilla::Role::AfterBuild',
 );
 
 has author => (is=>'rw');
@@ -19,7 +19,7 @@ has module => (is=>'rw');
 
 sub mvp_multivalue_args { qw(author module) }
 
-sub setup_installer {}
+sub after_build {}
 
 __PACKAGE__->meta->make_immutable;
 1;

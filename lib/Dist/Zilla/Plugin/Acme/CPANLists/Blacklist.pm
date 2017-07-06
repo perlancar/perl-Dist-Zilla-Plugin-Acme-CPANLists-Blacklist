@@ -13,7 +13,7 @@ use namespace::autoclean;
 use Module::Load;
 
 with (
-    'Dist::Zilla::Role::InstallTool',
+    'Dist::Zilla::Role::AfterBuild',
 );
 
 has author_list => (is=>'rw');
@@ -59,9 +59,7 @@ sub _prereq_none {
     $num_any == 0;
 }
 
-# actually we use InstallTool phase just so we are run after all the
-# PrereqSources plugins
-sub setup_installer {
+sub after_build {
     use experimental 'smartmatch';
     no strict 'refs';
 
