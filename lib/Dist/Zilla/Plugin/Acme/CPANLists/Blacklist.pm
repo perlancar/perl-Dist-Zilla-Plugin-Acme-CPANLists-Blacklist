@@ -130,8 +130,8 @@ sub after_build {
     my $prereqs_hash = $self->zilla->prereqs->as_string_hash;
 
     my @all_prereqs;
-    for my $phase (keys %$prereqs_hash) {
-        for my $rel (keys %{ $prereqs_hash->{$phase} }) {
+    for my $phase (grep {!/x_/} keys %$prereqs_hash) {
+        for my $rel (grep {!/x_/} keys %{ $prereqs_hash->{$phase} }) {
             for my $mod (keys %{ $prereqs_hash->{$phase}{$rel} }) {
                 push @all_prereqs, $mod
                     unless $mod ~~ @all_prereqs;
