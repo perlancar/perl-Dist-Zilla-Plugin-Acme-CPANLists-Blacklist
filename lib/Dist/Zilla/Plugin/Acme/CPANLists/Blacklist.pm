@@ -186,6 +186,8 @@ In F<dist.ini>:
 During build, if there is a prereq to a module listed in the above list, the
 build process will be aborted.
 
+Currently prereqs with custom phase (/^x_/) or custom relationship are ignored.
+
 
 =head1 DESCRIPTION
 
