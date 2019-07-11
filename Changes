@@ -1,21 +1,21 @@
-0.04    2017-07-28 (PERLANCAR)
+0.04    2017-07-28  Released-By: PERLANCAR
 
 	- Ignore /^x_/ phase & relationship prereqs.
 
 
-0.03    2017-07-06 (PERLANCAR)
+0.03    2017-07-06  Released-By: PERLANCAR
 
 	- Switch from (ab)using InstallTool phase to using AfterBuild phase
 	  to do our stuffs, to be compatible with DZP:StaticInstall.
 
 
-0.02    2016-02-14 (PERLANCAR)
+0.02    2016-02-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Adjust to App::lcpan::Call 0.07.
 
 
-0.01    2015-10-22 (PERLANCAR)
+0.01    2015-10-22  Released-By: PERLANCAR
 
         - First release.
